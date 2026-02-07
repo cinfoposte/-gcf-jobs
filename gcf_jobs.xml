@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<rss xmlns:ns0="http://www.w3.org/2005/Atom" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+  <channel>
+    <title>Green Climate Fund Jobs</title>
+    <link>https://jobs.greenclimate.fund/en/sites/CX_1001/jobs</link>
+    <description>Job listings from Green Climate Fund</description>
+    <language>en-us</language>
+    <ns0:link href="https://cinfoposte.github.io/gcf-jobs/gcf_jobs.xml" rel="self" type="application/rss+xml"/>
+    <lastBuildDate>Sat, 07 Feb 2026 20:49:15 +0000</lastBuildDate>
+    <item>
+      <title>Regional Lead for Resource Mobilization - Europe</title>
+      <link>https://jobs.greenclimate.fund/en/sites/CX_1001/job/3279</link>
+      <description>Regional Lead for Resource Mobilization - Europe | Location: Incheon, Korea, Republic ofand1more</description>
+      <guid isPermaLink="true">https://jobs.greenclimate.fund/en/sites/CX_1001/job/3279</guid>
+    </item>
+    <item>
+      <title>Accreditation Officer (2 positions)</title>
+      <link>https://jobs.greenclimate.fund/en/sites/CX_1001/job/3277</link>
+      <description>Accreditation Officer (2 positions) | Location: Incheon, Korea, Republic of</description>
+      <guid isPermaLink="true">https://jobs.greenclimate.fund/en/sites/CX_1001/job/3277</guid>
+    </item>
+    <item>
+      <title>Readiness Programme Officer (2 positions)</title>
+      <link>https://jobs.greenclimate.fund/en/sites/CX_1001/job/3278</link>
+      <description>Readiness Programme Officer (2 positions) | Location: Incheon, Korea, Republic of</description>
+      <guid isPermaLink="true">https://jobs.greenclimate.fund/en/sites/CX_1001/job/3278</guid>
+    </item>
+  </channel>
+</rss>
