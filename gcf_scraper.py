@@ -255,9 +255,11 @@ def scrape_gcf_jobs():
 def generate_rss_feed(jobs, output_file='gcf_jobs.xml'):
     """Generate RSS 2.0 feed from job listings"""
 
-    # Create RSS root element
+    # Register atom namespace with proper prefix
+    ET.register_namespace('atom', 'http://www.w3.org/2005/Atom')
+
+    # Create RSS root element (namespace will be added automatically)
     rss = ET.Element('rss', version='2.0')
-    rss.set('xmlns:atom', 'http://www.w3.org/2005/Atom')
 
     # Create channel element
     channel = ET.SubElement(rss, 'channel')
@@ -314,6 +316,16 @@ def generate_rss_feed(jobs, output_file='gcf_jobs.xml'):
 
     # Create pretty-printed XML
     xml_string = ET.tostring(rss, encoding='unicode')
+
+    # Fix namespace prefix issue: replace ns0: with atom:
+    xml_string = xml_string.replace('xmlns:ns0=', 'xmlns:atom=')
+    xml_string = xml_string.replace('<ns0:', '<atom:')
+    xml_string = xml_string.replace('</ns0:', '</atom:')
+
+    # Remove duplicate xmlns:atom if it exists
+    import re
+    xml_string = re.sub(r'xmlns:atom="[^"]*"\s+xmlns:atom="[^"]*"', 'xmlns:atom="http://www.w3.org/2005/Atom"', xml_string)
+
     dom = minidom.parseString(xml_string)
     pretty_xml = dom.toprettyxml(indent='  ')
 

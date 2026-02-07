@@ -1,12 +1,12 @@
 <?xml version="1.0" ?>
-<rss xmlns:ns0="http://www.w3.org/2005/Atom" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
   <channel>
     <title>Green Climate Fund Jobs</title>
     <link>https://jobs.greenclimate.fund/en/sites/CX_1001/jobs</link>
     <description>Job listings from Green Climate Fund</description>
     <language>en-us</language>
-    <ns0:link href="https://cinfoposte.github.io/gcf-jobs/gcf_jobs.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Sat, 07 Feb 2026 20:49:15 +0000</lastBuildDate>
+    <atom:link href="https://cinfoposte.github.io/gcf-jobs/gcf_jobs.xml" rel="self" type="application/rss+xml"/>
+    <lastBuildDate>Sat, 07 Feb 2026 20:57:09 +0000</lastBuildDate>
     <item>
       <title>Regional Lead for Resource Mobilization - Europe</title>
       <link>https://jobs.greenclimate.fund/en/sites/CX_1001/job/3279</link>
