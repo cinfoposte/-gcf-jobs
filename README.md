@@ -3,7 +3,7 @@
 Automated RSS feed generator for job listings from the Green Climate Fund (GCF).
 
 ## RSS Feed URL
-**Live Feed:** `https://cinfoposte.github.io/gcf-jobs/gcf_jobs.xml`
+**Live Feed:** `https://cinfoposte.github.io/-gcf-jobs/gcf_jobs.xml`
 
 ## About
 This scraper automatically fetches job listings from [jobs.greenclimate.fund](https://jobs.greenclimate.fund/en/sites/CX_1001/jobs) and generates an RSS 2.0 compliant feed that updates twice weekly.
@@ -61,5 +61,5 @@ The Green Climate Fund (GCF) is the world's largest dedicated climate fund, help
 ---
 
 **Created by:** cinfoposte
-**GitHub:** https://github.com/cinfoposte/gcf-jobs
+**GitHub:** https://github.com/cinfoposte/-gcf-jobs
 **License:** MIT
