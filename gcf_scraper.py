@@ -5,6 +5,7 @@ Scrapes job listings from https://jobs.greenclimate.fund/ and generates an RSS f
 """
 
 import time
+import os
 from datetime import datetime, timezone
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -12,7 +13,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
@@ -26,10 +26,37 @@ def setup_driver():
     chrome_options.add_argument('--disable-gpu')
     chrome_options.add_argument('--window-size=1920,1080')
     chrome_options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
-
-    service = Service(ChromeDriverManager().install())
+    
+    # For GitHub Actions: use system Chrome
+    service = Service('/usr/bin/chromedriver')
     driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
+
+def get_existing_job_links(feed_file='gcf_jobs.xml'):
+    """Extract job links from existing RSS feed"""
+    existing_links = set()
+    
+    if not os.path.exists(feed_file):
+        print("No existing feed found - all jobs will be considered new")
+        return existing_links
+    
+    try:
+        tree = ET.parse(feed_file)
+        root = tree.getroot()
+        
+        # Find all <link> elements within <item> elements
+        for item in root.findall('.//item'):
+            link_elem = item.find('link')
+            if link_elem is not None and link_elem.text:
+                existing_links.add(link_elem.text.strip())
+        
+        print(f"Found {len(existing_links)} existing jobs in previous feed")
+        
+    except Exception as e:
+        print(f"Error reading existing feed: {str(e)}")
+        print("Will treat all jobs as new")
+    
+    return existing_links
 
 def scrape_gcf_jobs():
     """Scrape job listings from Green Climate Fund"""
@@ -266,13 +293,13 @@ def generate_rss_feed(jobs, output_file='gcf_jobs.xml'):
 
     # Add channel metadata
     title = ET.SubElement(channel, 'title')
-    title.text = 'Green Climate Fund Jobs'
+    title.text = 'Green Climate Fund Jobs - New Postings'
 
     link = ET.SubElement(channel, 'link')
     link.text = 'https://jobs.greenclimate.fund/en/sites/CX_1001/jobs'
 
     description = ET.SubElement(channel, 'description')
-    description.text = 'Job listings from Green Climate Fund'
+    description.text = 'New job listings from Green Climate Fund'
 
     language = ET.SubElement(channel, 'language')
     language.text = 'en-us'
@@ -285,7 +312,8 @@ def generate_rss_feed(jobs, output_file='gcf_jobs.xml'):
 
     # Add lastBuildDate
     last_build = ET.SubElement(channel, 'lastBuildDate')
-    last_build.text = datetime.now(timezone.utc).strftime('%a, %d %b %Y %H:%M:%S +0000')
+    current_time = datetime.now(timezone.utc)
+    last_build.text = current_time.strftime('%a, %d %b %Y %H:%M:%S +0000')
 
     # Add job items
     for job in jobs:
@@ -300,19 +328,20 @@ def generate_rss_feed(jobs, output_file='gcf_jobs.xml'):
         item_description = ET.SubElement(item, 'description')
         item_description.text = job.get('description', '')
 
+        # Add publication date (when the job was found)
+        pub_date = ET.SubElement(item, 'pubDate')
+        if job.get('pubDate'):
+            try:
+                pub_date.text = job['pubDate']
+            except:
+                pub_date.text = current_time.strftime('%a, %d %b %Y %H:%M:%S +0000')
+        else:
+            pub_date.text = current_time.strftime('%a, %d %b %Y %H:%M:%S +0000')
+
         # Add GUID
         guid = ET.SubElement(item, 'guid')
         guid.set('isPermaLink', 'true')
         guid.text = job.get('link', '')
-
-        # Add pubDate if available
-        if job.get('pubDate'):
-            pub_date = ET.SubElement(item, 'pubDate')
-            try:
-                # Try to parse and format the date
-                pub_date.text = job['pubDate']
-            except:
-                pub_date.text = datetime.now(timezone.utc).strftime('%a, %d %b %Y %H:%M:%S +0000')
 
     # Create pretty-printed XML
     xml_string = ET.tostring(rss, encoding='unicode')
@@ -345,15 +374,37 @@ def main():
     print("Green Climate Fund Job Scraper")
     print("=" * 60)
 
-    # Scrape jobs
-    jobs = scrape_gcf_jobs()
+    # Get existing job links from previous feed
+    existing_links = get_existing_job_links()
 
-    if jobs:
-        # Generate RSS feed
-        generate_rss_feed(jobs)
-        print("\n[SUCCESS] Scraping completed successfully!")
+    # Scrape jobs
+    all_jobs = scrape_gcf_jobs()
+
+    # Filter to only new jobs
+    new_jobs = [job for job in all_jobs if job.get('link') not in existing_links]
+    
+    print("\n" + "=" * 60)
+    print(f"Total jobs found: {len(all_jobs)}")
+    print(f"New jobs (not in previous feed): {len(new_jobs)}")
+    print(f"Existing jobs (skipped): {len(all_jobs) - len(new_jobs)}")
+    print("=" * 60)
+
+    if new_jobs:
+        # Generate RSS feed with only new jobs
+        generate_rss_feed(new_jobs)
+        print("\n[SUCCESS] Feed updated with new jobs!")
+        
+        # List the new jobs
+        print("\nNew jobs added to feed:")
+        for i, job in enumerate(new_jobs, 1):
+            print(f"  {i}. {job['title']}")
     else:
-        print("\n[ERROR] No jobs found. Please check the website structure.")
+        print("\n[INFO] No new jobs found - feed not updated")
+        # If there are no new jobs, we still need to keep the existing feed
+        # so we don't create an empty feed
+        if not os.path.exists('gcf_jobs.xml'):
+            print("[INFO] Creating empty feed file")
+            generate_rss_feed([])
 
     print("=" * 60)
 
